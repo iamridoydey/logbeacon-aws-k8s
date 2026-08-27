@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logbeacon-backend-config
+
+data:
+  GROQ_MODEL: "openai/gpt-oss-120b"
+  CHAT_RETENTION_DAYS: "30"
+  MAX_ERROR_LENGTH: "5000"
+  PRICE_PER_MILLION_TOKENS: "0.59"
+  SMTP_HOST: "smtp.example.com"
+  SMTP_PORT: "587"
+  ALLOWED_ORIGINS: "http://localhost:5000, https://aws-logbeacon.iamridoydey.me"

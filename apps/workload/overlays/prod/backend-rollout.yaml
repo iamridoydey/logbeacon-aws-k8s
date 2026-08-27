@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: logbeacon-backend
+
+spec:
+  replicas: 3
+
+  template:
+    spec:
+      containers:
+        - name: backend
+          image: logbeacon/backend:prod

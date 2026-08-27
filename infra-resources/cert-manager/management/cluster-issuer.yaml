@@ -1,0 +1,26 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+
+metadata:
+  name: letsencrypt-cloudflare
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+
+spec:
+  acme:
+    #  Let's encrypt will use this email for expiration notices and account recovery
+    email: student.iamridoydey@gmail.com
+    #  Let's encrypt acme endpoint
+    server: https://acme-v02.api.letsencrypt.org/directory
+
+    privateKeySecretRef:
+      # Secret will be created
+      name: letsencrypt-cloudflare-account-key
+
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-credentials
+              key: API_TOKEN

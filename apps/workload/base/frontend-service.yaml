@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: logbeacon-frontend-stable
+  namespace: logbeacon
+spec:
+  selector:
+    app: logbeacon-frontend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logbeacon-frontend-canary
+  namespace: logbeacon
+spec:
+  selector:
+    app: logbeacon-frontend
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http

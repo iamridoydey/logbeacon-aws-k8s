@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: workload-traefik
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "50"
+
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://traefik.github.io/charts
+      chart: traefik
+      targetRevision: 41.1.1
+
+      helm:
+        valueFiles:
+          - $values/infra/traefik-values.yaml
+
+    - repoURL: https://github.com/iamridoydey/lobeacon-aws-k8s.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    name: workload-cluster
+    namespace: traefik
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

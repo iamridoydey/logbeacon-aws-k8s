@@ -1,0 +1,13 @@
+providers:
+  # Tells traefik watch kubernetes gateway resources
+  kubernetesGateway:
+    enabled: true
+
+  kubernetesIngress:
+    enabled: false
+
+gateway:
+  enabled: true
+
+service:
+  type: LoadBalancer

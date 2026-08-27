@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: postgresql
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "35"
+
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: postgresql
+      targetRevision: 16.7.24
+
+      helm:
+        valueFiles:
+          - $values/infra/postgres-values.yaml
+
+    - repoURL: https://github.com/iamridoydey/lobeacon-aws-k8s.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    name: workload-cluster
+    namespace: postgresql
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

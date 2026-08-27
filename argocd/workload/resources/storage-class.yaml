@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gp3-storage
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
+    targetRevision: HEAD
+    path: infra-resources/storage
+  
+  destination:
+    name: workload-cluster
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

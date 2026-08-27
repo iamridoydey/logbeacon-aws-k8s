@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: logbeacon-backend-stable
+  namespace: logbeacon
+spec:
+  selector:
+    app: logbeacon-backend
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logbeacon-backend-canary
+  namespace: logbeacon
+spec:
+  selector:
+    app: logbeacon-backend
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http

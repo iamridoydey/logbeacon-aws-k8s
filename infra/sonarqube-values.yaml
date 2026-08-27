@@ -1,0 +1,17 @@
+monitoringPasscode: ""
+
+persistence:
+  enabled: true
+  storageClass: gp3
+  size: 10Gi
+
+resources:
+  requests:
+    cpu: 256m
+    memory: 1Gi
+  limits:
+    cpu: "512m"
+    memory: 2Gi
+
+service:
+  type: ClusterIP

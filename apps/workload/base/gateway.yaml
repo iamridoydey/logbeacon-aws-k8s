@@ -1,0 +1,40 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+
+metadata:
+  name: logbeacon-gateway
+  namespace: logbeacon
+
+spec:
+  gatewayClassName: traefik
+
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+
+      hostname: "*.aws-logbeacon.iamridoydey.me"
+
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: logbeacon-tls
+
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+    - name: https-root
+      protocol: HTTPS
+      port: 443
+
+      hostname: "aws-logbeacon.iamridoydey.me"
+
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: logbeacon-tls
+
+      allowedRoutes:
+        namespaces:
+          from: Same

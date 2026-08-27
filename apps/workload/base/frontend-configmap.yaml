@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logbeacon-frontend-config
+
+data:
+  FLASK_API_URL: "api.aws-logbeacon.iamridoydey.me"

@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: redis
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "40"
+
+spec:
+  project: default
+
+  sources:
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: redis
+      targetRevision: 28.0.0
+
+      helm:
+        valueFiles:
+          - $values/infra/redis-values.yaml
+
+    - repoURL: https://github.com/iamridoydey/lobeacon-aws-k8s.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    name: workload-cluster
+    namespace: redis
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-apps
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "35"
+
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
+    targetRevision: HEAD
+    path: apps/management
+  
+  destination:
+    server: https://kubernetes.default.svc
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true

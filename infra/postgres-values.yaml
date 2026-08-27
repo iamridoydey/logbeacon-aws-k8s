@@ -1,0 +1,27 @@
+architecture: standalone
+
+auth:
+  existingSecret: logbeacon-app-secret
+  secretKeys:
+    adminPasswordKey: POSTGRES_PASSWORD
+    userPasswordKey: POSTGRES_PASSWORD
+
+  username: logbeacon
+  database: logbeacon_db
+
+primary:
+  persistence:
+    enabled: true
+    storageClass: gp3
+    size: 8Gi
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "500m"
+      memory: 512Mi
+
+service:
+  type: ClusterIP

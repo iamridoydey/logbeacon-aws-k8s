@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: logbeacon-tls
+  namespace: logbeacon
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+
+spec:
+  secretName: logbeacon-tls
+
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+
+  dnsNames:
+    - aws-logbeacon.iamridoydey.me
+    - "*.aws-logbeacon.iamridoydey.me"

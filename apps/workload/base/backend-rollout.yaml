@@ -1,0 +1,70 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: logbeacon-backend
+  namespace: logbeacon
+
+spec:
+  replicas: 1
+
+  strategy:
+    canary:
+      canaryService: logbeacon-backend-canary
+      stableService: logbeacon-backend-stable
+      steps:
+        - setWeight: 20
+        - pause: {}
+        - setWeight: 50
+        - pause:
+            duration: 30s
+
+  selector:
+    matchLabels:
+      app: logbeacon-backend
+
+  template:
+    metadata:
+      labels:
+        app: logbeacon-backend
+
+    spec:
+      serviceAccountName: logbeacon-app
+
+      containers:
+        - name: backend
+          image: logbeacon/backend:placeholder
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: logbeacon-backend-config
+
+            - secretRef:
+                name: logbeacon-app-secret
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20

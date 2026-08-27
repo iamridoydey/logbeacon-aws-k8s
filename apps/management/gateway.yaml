@@ -1,0 +1,28 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+
+metadata:
+  name: argocd-gateway
+  namespace: management
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+
+spec:
+  gatewayClassName: traefik
+
+  listeners:
+    - name: https-root
+      protocol: HTTPS
+      port: 443
+
+      hostname: "argo.aws-logbeacon.iamridoydey.me"
+
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: argocd-tls
+
+      allowedRoutes:
+        namespaces:
+          from: Same

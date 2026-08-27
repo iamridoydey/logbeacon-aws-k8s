@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: workload-root
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "50"
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
+    targetRevision: main
+    path: argocd/workload
+
+  destination:
+    name: workload-cluster
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
