@@ -2,11 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: logbeacon-prod
+  name: management-root
   namespace: argocd
-
-  annotations:
-    argocd.argoproj.io/sync-wave: "65"
 
 spec:
   project: default
@@ -14,11 +11,11 @@ spec:
   source:
     repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
     targetRevision: main
-    path: apps/logbeacon/overlays/prod
+    path: argocd/management
 
   destination:
-    name: workload-cluster
-    namespace: logbeacon
+    server: https://kubernetes.default.svc
+    namespace: argocd
 
   syncPolicy:
     automated:

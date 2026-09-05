@@ -6,9 +6,3 @@ metadata:
 
 spec:
   replicas: 3
-
-  template:
-    spec:
-      containers:
-        - name: backend
-          image: logbeacon/backend:prod

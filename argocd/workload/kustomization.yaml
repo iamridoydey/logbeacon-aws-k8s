@@ -10,11 +10,13 @@ resources:
   - charts/postgresql.yaml
   - charts/redis.yaml
   - charts/sonarqube.yaml
+  - charts/argo-rollouts.yaml
   # Workload cluster raw-resource applications
-  - resources/namespaces.yaml
+  # - resources/ns-sa.yaml # Don't it now
   - resources/cluster-secret-store.yaml
-  - resources/secrets.yaml
+  - resources/external-secrets.yaml
   - resources/storage-class.yaml
+  - resources/gateway-api.yaml
   # - apps/workload-apps-dev.yaml
   # - apps/workload-apps-qa.yaml
   - apps/workload-apps-prod.yaml # Only run prod to reduce the cost

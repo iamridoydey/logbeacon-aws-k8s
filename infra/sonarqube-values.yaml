@@ -1,5 +1,10 @@
 monitoringPasscode: ""
 
+serviceAccount:
+  create: true
+  name: sonarqube
+  automountToken: true
+
 persistence:
   enabled: true
   storageClass: gp3

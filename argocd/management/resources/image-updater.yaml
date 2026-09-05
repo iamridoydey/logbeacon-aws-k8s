@@ -1,0 +1,40 @@
+apiVersion: argocd-image-updater.argoproj.io/v1alpha1
+kind: ImageUpdater
+
+metadata:
+  name: logbeacon-prod
+  namespace: argocd
+
+  annotations:
+    argocd.argoproj.io/sync-wave: "45"
+
+spec:
+  writeBackConfig:
+    method: "git:secret:argocd/github-secret"
+
+    gitConfig:
+      repository: "https://github.com/iamridoydey/logbeacon-aws-k8s.git"
+      branch: "main"
+      writeBackTarget: "kustomization"
+
+  applicationRefs:
+    - namePattern: "logbeacon-prod"
+
+      images:
+        - alias: frontend
+          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend:v1.0.0"
+          commonUpdateSettings:
+            updateStrategy: semver
+
+          manifestTargets:
+            kustomize:
+              name: "logbeacon/frontend"
+
+        - alias: backend
+          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend:v1.0.0"
+          commonUpdateSettings:
+            updateStrategy: semver
+
+          manifestTargets:
+            kustomize:
+              name: "logbeacon/backend"

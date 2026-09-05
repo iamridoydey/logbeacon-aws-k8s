@@ -1,0 +1,18 @@
+#===================================================
+#                 Namespaces
+#===================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: logbeacon
+---
+
+#===================================================
+#                 Service Accounts
+#===================================================
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logbeacon
+  namespace: logbeacon

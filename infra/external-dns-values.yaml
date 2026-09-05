@@ -5,7 +5,7 @@ env:
   - name: CF_API_TOKEN
     valueFrom:
       secretKeyRef:
-        name: cloudflare-api-token
+        name: cloudflare-dns-secret
         key: API_TOKEN
 
 sources:
@@ -16,7 +16,7 @@ policy: sync
 
 registry: txt
 
-txtOwnerId: logbeacon-workload
+txtOwnerId: logbeacon
 
 domainFilters:
   - iamridoydey.me

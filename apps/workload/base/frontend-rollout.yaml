@@ -12,6 +12,11 @@ spec:
     canary:
       canaryService: logbeacon-frontend-canary
       stableService: logbeacon-frontend-stable
+      trafficRouting:
+        plugins:
+          argoproj-labs/gatewayAPI:
+            httpRoute: logbeacon-backend
+            namespace: logbeacon
       steps:
         - setWeight: 20
         - pause: {}
@@ -29,7 +34,7 @@ spec:
         app: logbeacon-frontend
 
     spec:
-      serviceAccountName: logbeacon-app
+      serviceAccountName: logbeacon
 
       containers:
         - name: frontend

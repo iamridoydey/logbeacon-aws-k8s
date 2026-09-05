@@ -2,31 +2,31 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: traefik
+  name: argocd-image-updater
   namespace: argocd
 
   annotations:
-    argocd.argoproj.io/sync-wave: "35"
+    argocd.argoproj.io/sync-wave: "40"
 
 spec:
   project: default
 
   sources:
-    - repoURL: https://traefik.github.io/charts
-      chart: traefik
-      targetRevision: 41.1.1
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argocd-image-updater
+      targetRevision: "1.2.4"
 
       helm:
         valueFiles:
-          - $values/infra/traefik-values.yaml
+          - $values/apps/infra/image-updater-values.yaml
 
-    - repoURL: https://github.com/iamridoydey/lobeacon-aws-k8s.git
+    - repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
       targetRevision: main
       ref: values
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: traefik
+    namespace: argocd
 
   syncPolicy:
     automated:

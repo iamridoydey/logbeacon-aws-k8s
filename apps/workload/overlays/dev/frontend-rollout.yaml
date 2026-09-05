@@ -6,9 +6,3 @@ metadata:
 
 spec:
   replicas: 1
-
-  template:
-    spec:
-      containers:
-        - name: frontend
-          image: logbeacon/frontend:dev

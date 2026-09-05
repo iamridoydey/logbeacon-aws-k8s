@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: required-namespaces
+  name: required-ns-sa
   namespace: argocd
 
   annotations:
@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
     targetRevision: HEAD
-    path: infra-resources/namespaces/management
+    path: infra-resources/ns-sa/management
   
   destination:
     server: https://kubernetes.default.svc

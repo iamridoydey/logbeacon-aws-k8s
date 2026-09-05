@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: logbeacon-backend-config
+  name: logbeacon-backend-config-dev
 
 data:
   ALLOWED_ORIGINS: "https://dev.aws-logbeacon.iamridoydey.me"

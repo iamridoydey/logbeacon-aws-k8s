@@ -1,0 +1,254 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sonarqube-bootstrap
+  namespace: sonarqube
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+
+spec:
+  backoffLimit: 5
+  activeDeadlineSeconds: 900
+
+  template:
+    metadata:
+      labels:
+        app: sonarqube-bootstrap
+
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: sonarqube
+
+      containers:
+        - name: bootstrap
+          image: amazon/aws-cli:2.27.54
+
+          env:
+            - name: AWS_REGION
+              value: "us-east-1"
+
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+
+            - name: SONAR_HOST_URL
+              value: "https://sonarqube.aws-logbeacon.iamridoydey.me"
+
+            - name: ADMIN_SECRET_NAME
+              value: "sonarqube-admin-password"
+
+            - name: CI_SECRET_NAME
+              value: "sonarqube-ci-cred"
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+
+          command:
+            - /bin/sh
+            - -c
+
+          args:
+            - |
+              set -eu
+
+              # ============================================================
+              # Check required commands
+              # ============================================================
+
+              if ! command -v curl >/dev/null 2>&1; then
+                echo "ERROR: curl is not available in the container." >&2
+                exit 1
+              fi
+
+
+              # ============================================================
+              # Wait for SonarQube
+              # ============================================================
+
+              echo "Waiting for SonarQube..."
+
+              until curl -sf \
+                "${SONAR_HOST_URL}/api/system/status" \
+                | grep -q '"status":"UP"'; do
+
+                echo "SonarQube is not ready yet..."
+                sleep 10
+
+              done
+
+              echo "SonarQube is ready."
+
+
+              # ============================================================
+              # Fetch target admin password from AWS Secrets Manager
+              # ============================================================
+
+              echo "Fetching SonarQube admin password..."
+
+              ADMIN_SECRET="$(aws secretsmanager get-secret-value \
+                --secret-id "${ADMIN_SECRET_NAME}" \
+                --query 'SecretString' \
+                --output text)"
+
+              ADMIN_PASSWORD="$(echo "${ADMIN_SECRET}" \
+                | sed -n 's/.*"ADMIN_PASSWORD":"\([^"]*\)".*/\1/p')"
+
+
+              if [ -z "${ADMIN_PASSWORD}" ]; then
+                echo "ERROR: ADMIN_PASSWORD could not be extracted from ${ADMIN_SECRET_NAME}." >&2
+                exit 1
+              fi
+
+
+              # ============================================================
+              # Check current SonarQube admin password
+              # ============================================================
+
+              echo "Checking SonarQube admin credentials..."
+
+              if curl -sf \
+                -u "admin:${ADMIN_PASSWORD}" \
+                "${SONAR_HOST_URL}/api/authentication/validate" \
+                | grep -q '"valid":true'; then
+
+                echo "SonarQube already uses the configured admin password."
+
+              elif curl -sf \
+                -u "admin:admin" \
+                "${SONAR_HOST_URL}/api/authentication/validate" \
+                | grep -q '"valid":true'; then
+
+                echo "SonarQube is still using the default admin password."
+                echo "Rotating admin password..."
+
+                curl -sf \
+                  -u "admin:admin" \
+                  -X POST \
+                  --data-urlencode "login=admin" \
+                  --data-urlencode "previousPassword=admin" \
+                  --data-urlencode "password=${ADMIN_PASSWORD}" \
+                  "${SONAR_HOST_URL}/api/users/change_password"
+
+                echo "Admin password rotation completed."
+
+                echo "Verifying new admin password..."
+
+                if ! curl -sf \
+                  -u "admin:${ADMIN_PASSWORD}" \
+                  "${SONAR_HOST_URL}/api/authentication/validate" \
+                  | grep -q '"valid":true'; then
+
+                  echo "ERROR: New SonarQube admin password verification failed." >&2
+                  exit 1
+                fi
+
+                echo "New admin password verified."
+
+              else
+
+                echo "ERROR: SonarQube admin authentication failed." >&2
+                echo "Neither the AWS Secrets Manager password nor the default password works." >&2
+                exit 1
+
+              fi
+
+
+              # ============================================================
+              # Check existing CI credential secret
+              # ============================================================
+
+              echo "Checking existing SonarQube CI credential..."
+
+              # Terraform is expected to create this AWS secret.
+              CI_SECRET="$(aws secretsmanager get-secret-value \
+                --secret-id "${CI_SECRET_NAME}" \
+                --query 'SecretString' \
+                --output text)"
+
+
+              # If a token already exists, bootstrap is complete.
+              if echo "${CI_SECRET}" | grep -q '"SONAR_TOKEN"'; then
+
+                TOKEN_VALUE="$(echo "${CI_SECRET}" \
+                  | sed -n 's/.*"SONAR_TOKEN":"\([^"]*\)".*/\1/p')"
+
+                if [ -n "${TOKEN_VALUE}" ]; then
+                  echo "SonarQube CI token already exists."
+                  echo "Nothing to do."
+                  exit 0
+                fi
+
+              fi
+
+
+              # ============================================================
+              # Revoke any stale token with the same name
+              # ============================================================
+              #
+              # Token names must be unique per SonarQube user. If a prior
+              # run generated a token but failed before it could be saved
+              # to Secrets Manager (e.g. a retry via backoffLimit), the
+              # name "logbeacon-ci-cred" would already be taken and
+              # generation below would fail. Revoking first makes this
+              # step safely retryable.
+              # ============================================================
+
+              echo "Revoking any pre-existing token named logbeacon-ci-cred..."
+
+              curl -sf \
+                -u "admin:${ADMIN_PASSWORD}" \
+                -X POST \
+                --data-urlencode "name=logbeacon-ci-cred" \
+                "${SONAR_HOST_URL}/api/user_tokens/revoke" \
+                || echo "No existing token to revoke, or revoke failed silently — continuing."
+
+
+              # ============================================================
+              # Generate SonarQube CI token
+              # ============================================================
+
+              echo "Generating SonarQube CI token..."
+
+              RESPONSE="$(curl -sf \
+                -u "admin:${ADMIN_PASSWORD}" \
+                -X POST \
+                --data-urlencode "name=logbeacon-ci-cred" \
+                "${SONAR_HOST_URL}/api/user_tokens/generate")"
+
+
+              TOKEN="$(echo "${RESPONSE}" \
+                | sed -n 's/.*"token":"\([^"]*\)".*/\1/p')"
+
+
+              if [ -z "${TOKEN}" ]; then
+                echo "ERROR: SonarQube token generation failed." >&2
+                exit 1
+              fi
+
+              echo "SonarQube CI token generated."
+
+
+              # ============================================================
+              # Store CI credential in AWS Secrets Manager
+              # ============================================================
+
+              SECRET_STRING="$(printf \
+                '{"SONAR_HOST_URL":"%s","SONAR_TOKEN":"%s"}' \
+                "${SONAR_HOST_URL}" \
+                "${TOKEN}")"
+
+
+              echo "Updating ${CI_SECRET_NAME} in AWS Secrets Manager..."
+
+              aws secretsmanager put-secret-value \
+                --secret-id "${CI_SECRET_NAME}" \
+                --secret-string "${SECRET_STRING}" \
+                >/dev/null
+
+
+              echo "SonarQube bootstrap completed successfully."

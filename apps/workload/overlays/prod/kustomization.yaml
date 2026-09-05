@@ -8,3 +8,12 @@ patches:
     # Apart from these two file we have everything by default.
   - path: backend-rollout.yaml
   - path: frontend-rollout.yaml
+
+images:
+  - name: logbeacon/frontend
+    newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
+    newTag: v1.0.0
+
+  - name: logbeacon/backend
+    newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend
+    newTag: v1.0.0

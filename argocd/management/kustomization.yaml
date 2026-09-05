@@ -8,9 +8,12 @@ resources:
   - charts/external-secrets.yaml
   - charts/traefik.yaml
   # Management cluster raw-resource applications
-  - resources/namespaces.yaml
+  - resources/ns-sa.yaml
   - resources/cluster-secret-store.yaml
-  - resources/secrets.yaml
-  - resources/apps.yaml
+  - resources/external-secrets.yaml
+  # Image updater config to track your application image
+  - resources/image-updater.yaml
+  # Argo apps
+  - apps/management-apps.yaml
   # Root Application for the workload cluster
   - resources/workload-root.yaml

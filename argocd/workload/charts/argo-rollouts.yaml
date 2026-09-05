@@ -1,21 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
-metadata:
-  name: secrets
-  namespace: argocd
 
+metadata:
+  name: argo-rollouts
+  namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "15"
+    argocd.argoproj.io/sync-wave: "60"
 
 spec:
   project: default
+
   source:
-    repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
-    targetRevision: HEAD
-    path: infra-resources/secrets/management
-  
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-rollouts
+    targetRevision: "1.10.0"
+
   destination:
-    server: https://kubernetes.default.svc
+    name: workload-cluster
+    namespace: argo-rollouts
 
   syncPolicy:
     automated:

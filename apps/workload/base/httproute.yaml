@@ -19,7 +19,14 @@ spec:
 
       backendRefs:
         - name: logbeacon-frontend-stable
+          kind: Service
           port: 3000
+          weight: 100
+
+        - name: logbeacon-frontend-canary
+          kind: Service
+          port: 3000
+          weight: 0
 
 ---
 apiVersion: gateway.networking.k8s.io/v1
@@ -43,4 +50,11 @@ spec:
 
       backendRefs:
         - name: logbeacon-backend-stable
+          kind: Service
           port: 5000
+          weight: 100
+
+        - name: logbeacon-backend-canary
+          kind: Service
+          port: 5000
+          weight: 0
