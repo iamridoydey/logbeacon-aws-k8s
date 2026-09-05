@@ -20,7 +20,7 @@ spec:
         valueFiles:
           - $values/infra/sonarqube-values.yaml
 
-    - repoURL: https://github.com/iamridoydey/lobeacon-aws-k8s.git
+    - repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
       targetRevision: main
       ref: values
 
