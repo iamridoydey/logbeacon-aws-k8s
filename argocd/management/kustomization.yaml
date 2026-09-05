@@ -16,4 +16,4 @@ resources:
   # Argo apps
   - apps/management-apps.yaml
   # Root Application for the workload cluster
-  - resources/workload-root.yaml
+  - workload-root.yaml
