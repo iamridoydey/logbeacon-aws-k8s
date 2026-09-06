@@ -16,7 +16,7 @@ policy: sync
 
 registry: txt
 
-txtOwnerId: logbeacon
+txtOwnerId: logbeacon-workload
 
 domainFilters:
   - iamridoydey.me

@@ -2,21 +2,42 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # Workload cluster Helm applications
-  - charts/cert-manager.yaml
-  - charts/external-dns.yaml
-  - charts/external-secrets.yaml
-  - charts/traefik.yaml
-  - charts/postgresql.yaml
-  - charts/redis.yaml
-  - charts/sonarqube.yaml
-  - charts/argo-rollouts.yaml
-  # Workload cluster raw-resource applications
-  # - resources/ns-sa.yaml # Don't it now
-  - resources/cluster-secret-store.yaml
-  - resources/external-secrets.yaml
-  - resources/storage-class.yaml
+  # Wave 0 - Gateway API CRDs
   - resources/gateway-api.yaml
-  # - apps/workload-apps-dev.yaml
-  # - apps/workload-apps-qa.yaml
-  - apps/workload-apps-prod.yaml # Only run prod to reduce the cost
+
+  # Wave 5 - StorageClass
+  - resources/storage-class.yaml
+
+  # Wave 10 - External Secrets Operator
+  - charts/external-secrets.yaml
+
+  # Wave 15 - ClusterSecretStore
+  - resources/cluster-secret-store.yaml
+
+  # Wave 20 - ExternalSecrets
+  # Creates application, Cloudflare, SonarQube secrets, etc.
+  - resources/external-secrets.yaml
+
+  # Wave 25 - cert-manager
+  - charts/cert-manager.yaml
+
+  # Wave 30 - Traefik
+  - charts/traefik.yaml
+
+  # Wave 35 - ExternalDNS
+  - charts/external-dns.yaml
+
+  # Wave 40 - Argo Rollouts controller + CRDs
+  - charts/argo-rollouts.yaml
+
+  # Wave 45 - Redis
+  - charts/redis.yaml
+
+  # Wave 50 - PostgreSQL
+  - charts/postgresql.yaml
+
+  # Wave 55 - SonarQube
+  - charts/sonarqube.yaml
+
+  # Wave 60 - LogBeacon application
+  - apps/workload-apps.yaml

@@ -2,18 +2,39 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # Management cluster Helm applications
-  - charts/cert-manager.yaml
-  - charts/external-dns.yaml
-  - charts/external-secrets.yaml
-  - charts/traefik.yaml
-  # Management cluster raw-resource applications
+  # Wave 0 - Namespaces and ServiceAccounts
   - resources/ns-sa.yaml
+
+  # Wave 5 - Gateway API CRDs
+  - resources/gateway-api.yaml
+
+  # Wave 10 - External Secrets Operator
+  - charts/external-secrets.yaml
+
+  # Wave 15 - ClusterSecretStore
   - resources/cluster-secret-store.yaml
+
+  # Wave 20 - ExternalSecrets
+  # Creates Cloudflare, GitHub and workload EKS secrets
   - resources/external-secrets.yaml
-  # Image updater config to track your application image
+
+  # Wave 25 - cert-manager
+  - charts/cert-manager.yaml
+
+  # Wave 30 - Traefik
+  - charts/traefik.yaml
+
+  # Wave 35 - ExternalDNS
+  - charts/external-dns.yaml
+
+  # Wave 40 - Argo CD Image Updater controller + CRD
+  - charts/image-updater.yaml
+
+  # Wave 45 - ImageUpdater custom resource
   - resources/image-updater.yaml
-  # Argo apps
+
+  # Wave 50 - Management applications
   - apps/management-apps.yaml
-  # Root Application for the workload cluster
+
+  # Wave 55 - Bootstrap workload cluster applications
   - workload-root.yaml

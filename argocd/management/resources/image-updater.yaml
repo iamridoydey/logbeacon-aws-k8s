@@ -2,11 +2,11 @@ apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 
 metadata:
-  name: logbeacon-prod
+  name: logbeacon-image-updater
   namespace: argocd
 
   annotations:
-    argocd.argoproj.io/sync-wave: "19"
+    argocd.argoproj.io/sync-wave: "45"
 
 spec:
   writeBackConfig:
@@ -18,11 +18,11 @@ spec:
       writeBackTarget: "kustomization"
 
   applicationRefs:
-    - namePattern: "logbeacon-prod"
+    - namePattern: "logbeacon-apps"
 
       images:
         - alias: frontend
-          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend:v1.0.0"
+          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend:1.x"
           commonUpdateSettings:
             updateStrategy: semver
 
@@ -31,7 +31,7 @@ spec:
               name: "logbeacon/frontend"
 
         - alias: backend
-          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend:v1.0.0"
+          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend:1.x"
           commonUpdateSettings:
             updateStrategy: semver
 

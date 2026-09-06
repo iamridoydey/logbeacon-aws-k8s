@@ -1,0 +1,22 @@
+provider:
+  name: cloudflare
+
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-dns-secret
+        key: API_TOKEN
+
+sources:
+  - gateway-httproute
+
+# External DNS is allowed to create, update, and delete records in cloudflare
+policy: sync
+
+registry: txt
+
+txtOwnerId: logbeacon-management
+
+domainFilters:
+  - iamridoydey.me

@@ -2,17 +2,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 
 metadata:
-  name: logbeacon-backend
+  name: logbeacon-frontend
   namespace: logbeacon
 
 spec:
-  replicas: 1
+  replicas: 3
 
   strategy:
     canary:
-      canaryService: logbeacon-backend-canary
-      stableService: logbeacon-backend-stable
-      dynamicStableScale: true
+      canaryService: logbeacon-frontend-canary
+      stableService: logbeacon-frontend-stable
       trafficRouting:
         plugins:
           argoproj-labs/gatewayAPI:
@@ -27,27 +26,27 @@ spec:
 
   selector:
     matchLabels:
-      app: logbeacon-backend
+      app: logbeacon-frontend
 
   template:
     metadata:
       labels:
-        app: logbeacon-backend
+        app: logbeacon-frontend
 
     spec:
       serviceAccountName: logbeacon
 
       containers:
-        - name: backend
-          image: logbeacon/backend:placeholder
+        - name: frontend
+          image: logbeacon/frontend
           ports:
             - name: http
-              containerPort: 5000
+              containerPort: 3000
               protocol: TCP
 
           envFrom:
             - configMapRef:
-                name: logbeacon-backend-config
+                name: logbeacon-frontend-config
 
             - secretRef:
                 name: logbeacon-app-secret
@@ -63,14 +62,14 @@ spec:
 
           readinessProbe:
             httpGet:
-              path: /health
+              path: /
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
 
           livenessProbe:
             httpGet:
-              path: /health
+              path: /
               port: http
             initialDelaySeconds: 30
             periodSeconds: 20
