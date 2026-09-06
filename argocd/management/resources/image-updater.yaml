@@ -7,6 +7,9 @@ metadata:
 
   annotations:
     argocd.argoproj.io/sync-wave: "45"
+    
+    # Should be in dry run phase until the creation CRD
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 
 spec:
   writeBackConfig:
