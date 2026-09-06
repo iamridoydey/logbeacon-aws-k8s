@@ -18,7 +18,7 @@ spec:
 
       helm:
         valueFiles:
-          - $values/apps/infra/image-updater-values.yaml
+          - $values/infra/image-updater-values.yaml
 
     - repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
       targetRevision: main
