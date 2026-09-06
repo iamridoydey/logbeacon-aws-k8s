@@ -5,7 +5,7 @@ metadata:
   name: argo-rollouts
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "60"
+    argocd.argoproj.io/sync-wave: "45"
 
 spec:
   project: default

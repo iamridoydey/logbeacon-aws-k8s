@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: logbeacon-prod
+  name: logbeacon-apps
   namespace: argocd
 
   annotations:
@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
     targetRevision: main
-    path: apps/logbeacon/overlays/prod
+    path: apps/workload
 
   destination:
     name: workload-cluster

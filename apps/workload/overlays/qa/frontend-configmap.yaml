@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: logbeacon-frontend-config
-
-data:
-  API_BASE_URL: "https://api.qa.aws-logbeacon.iamridoydey.me"

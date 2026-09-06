@@ -6,7 +6,7 @@ metadata:
   namespace: argocd
 
   annotations:
-    argocd.argoproj.io/sync-wave: "30"
+    argocd.argoproj.io/sync-wave: "40"
 
 spec:
   project: default
@@ -18,7 +18,7 @@ spec:
 
       helm:
         valueFiles:
-          - $values/infra/external-dns-values.yaml
+          - $values/infra/workload-external-dns-values.yaml
     - repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
       targetRevision: main
       ref: values

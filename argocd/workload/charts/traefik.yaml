@@ -6,7 +6,7 @@ metadata:
   namespace: argocd
 
   annotations:
-    argocd.argoproj.io/sync-wave: "55"
+    argocd.argoproj.io/sync-wave: "35"
 
 spec:
   project: default
