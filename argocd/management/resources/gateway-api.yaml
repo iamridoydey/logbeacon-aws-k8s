@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: workload-gateway-api
+  name: management-gateway-api
   namespace: argocd
 
   annotations:
