@@ -1,8 +1,14 @@
+crds:
+  install: true
+  keep: true
+
 serviceAccount:
   create: true
   name: argocd-image-updater
 
 config:
+  log.level: info
+
   registries:
     - name: ECR
       api_url: https://869719105525.dkr.ecr.us-east-1.amazonaws.com
@@ -10,17 +16,12 @@ config:
       credentials: ext:/scripts/auth-ecr.sh
       credsexpire: 10h
 
+authScripts:
+  enabled: true
 
-  # Using the pod identity with SA(argocd-image-updater)
-  # to get a temporary ECR password. Becaues ECR want that
-  # password to be able to inspect the image tag
-  authScripts:
-    enabled: true
-    scripts:
-      auth-ecr.sh: |
-        #!/bin/sh
-        aws ecr --region us-east-1 get-authorization-token \
-          --output text \
-          --query 'authorizationData[].authorizationToken' | base64 -d
-
-logLevel: info
+  scripts:
+    auth-ecr.sh: |
+      #!/bin/sh
+      aws ecr --region us-east-1 get-authorization-token \
+        --output text \
+        --query 'authorizationData[].authorizationToken' | base64 -d
