@@ -17,7 +17,7 @@ spec:
     path: config/crd/standard
 
   destination:
-    name: workload-cluster
+    server: https://kubernetes.default.svc
 
   syncPolicy:
     automated:
