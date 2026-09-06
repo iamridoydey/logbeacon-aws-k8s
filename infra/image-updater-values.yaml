@@ -2,6 +2,9 @@ crds:
   install: true
   keep: true
 
+  annotations:
+      argocd.argoproj.io/sync-options: ServerSideApply=true
+      
 serviceAccount:
   create: true
   name: argocd-image-updater
