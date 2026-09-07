@@ -12,7 +12,7 @@ auth:
 primary:
   persistence:
     enabled: true
-    storageClass: gp3
+    storageClass: ebs-gp3
     size: 8Gi
 
   resources:

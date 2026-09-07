@@ -6,7 +6,7 @@ auth:
 master:
   persistence:
     enabled: true
-    storageClass: gp3
+    storageClass: ebs-gp3
     size: 4Gi
 
   resources:
