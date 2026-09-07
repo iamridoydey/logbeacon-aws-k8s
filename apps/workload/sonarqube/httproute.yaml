@@ -15,5 +15,5 @@ spec:
 
   rules:
     - backendRefs:
-        - name: sonarqube
+        - name: workload-sonarqube-sonarqube
           port: 9000
