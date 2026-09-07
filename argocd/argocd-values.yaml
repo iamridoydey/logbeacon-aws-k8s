@@ -1,6 +1,6 @@
 configs:
   params:
-    server.insecure: "true"
+    server.insecure: "false"
 
 server:
   replicas: 2
