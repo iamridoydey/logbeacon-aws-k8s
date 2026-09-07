@@ -6,12 +6,20 @@ metadata:
   namespace: argocd
 
   annotations:
-    argocd.argoproj.io/sync-wave: "35"
+    argocd.argoproj.io/sync-wave: "25"
 
 spec:
   project: default
 
   sources:
+    # Gateway API experimental CRDs — must exist before Traefik's
+    # kubernetesgateway provider starts watching TLSRoute/TCPRoute/UDPRoute,
+    # or the provider's informer cache never finishes syncing and
+    # GatewayClass/Gateway status updates freeze permanently.
+    - repoURL: https://github.com/kubernetes-sigs/gateway-api.git
+      targetRevision: v1.4.1
+      path: config/crd/experimental
+
     - repoURL: https://traefik.github.io/charts
       chart: traefik
       targetRevision: 41.1.1
@@ -35,3 +43,4 @@ spec:
 
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
