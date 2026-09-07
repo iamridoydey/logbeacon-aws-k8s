@@ -1,7 +1,17 @@
 architecture: standalone
 
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: bitnamilegacy/postgresql
+  tag: 17.5.0-debian-12-r20
+
 auth:
   existingSecret: logbeacon-app-secret
+
   secretKeys:
     adminPasswordKey: POSTGRES_PASSWORD
     userPasswordKey: POSTGRES_PASSWORD
