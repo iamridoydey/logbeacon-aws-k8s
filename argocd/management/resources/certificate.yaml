@@ -2,11 +2,11 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: logbeacon-apps
+  name: cert-manager-management-resources
   namespace: argocd
 
   annotations:
-    argocd.argoproj.io/sync-wave: "60"
+    argocd.argoproj.io/sync-wave: "25"
 
 spec:
   project: default
@@ -14,11 +14,11 @@ spec:
   source:
     repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
     targetRevision: main
-    path: apps/workload
+    path: infra-resources/cert-manager/management
 
   destination:
-    name: workload-cluster
-    namespace: logbeacon
+    server: https://kubernetes.default.svc
+    namespace: argocd
 
   syncPolicy:
     automated:
@@ -27,3 +27,4 @@ spec:
 
     syncOptions:
       - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
