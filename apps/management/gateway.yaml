@@ -14,7 +14,7 @@ spec:
   listeners:
     - name: https-root
       protocol: HTTPS
-      port: 443
+      port: 8443
 
       hostname: "argo.aws-logbeacon.iamridoydey.me"
 
