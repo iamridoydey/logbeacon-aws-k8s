@@ -31,9 +31,11 @@ spec:
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
+
 metadata:
   name: logbeacon-backend
   namespace: logbeacon
+
 spec:
   parentRefs:
     - name: logbeacon-gateway
@@ -71,12 +73,18 @@ metadata:
 spec:
   parentRefs:
     - name: logbeacon-gateway
-      namespace: sonarqube
+      namespace: logbeacon
+      sectionName: https
 
   hostnames:
     - sonarqube.aws-logbeacon.iamridoydey.me
 
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+
+      backendRefs:
         - name: sonarqube
           port: 9000

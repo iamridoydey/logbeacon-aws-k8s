@@ -22,7 +22,7 @@ spec:
 
       allowedRoutes:
         namespaces:
-          from: Same
+          from: All
 
     - name: https-root
       protocol: HTTPS
