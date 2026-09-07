@@ -2,42 +2,39 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # Wave 0 - Gateway API CRDs
-  - resources/gateway-api.yaml
-
-  # Wave 5 - StorageClass
+  # Wave 0 - StorageClass
   - resources/storage-class.yaml
 
-  # Wave 10 - External Secrets Operator
+  # Wave 5 - External Secrets Operator
   - charts/external-secrets.yaml
 
-  # Wave 15 - ClusterSecretStore
+  # Wave 10 - ClusterSecretStore
   - resources/cluster-secret-store.yaml
 
-  # Wave 20 - ExternalSecrets
+  # Wave 15 - ExternalSecrets
   # Creates application, Cloudflare, SonarQube secrets, etc.
   - resources/external-secrets.yaml
 
-  # Wave 25 - cert-manager
+  # Wave 20 - cert-manager
   - charts/cert-manager.yaml
 
-  # Wave 30 - Traefik
+  # Wave 25 - Traefik
   - charts/traefik.yaml
 
-  # Wave 35 - ExternalDNS
+  # Wave 30 - ExternalDNS
   - charts/external-dns.yaml
 
-  # Wave 40 - Argo Rollouts controller + CRDs
+  # Wave 35 - Argo Rollouts controller + CRDs
   - charts/argo-rollouts.yaml
 
-  # Wave 45 - Redis
+  # Wave 40 - Redis
   - charts/redis.yaml
 
-  # Wave 50 - PostgreSQL
+  # Wave 45 - PostgreSQL
   - charts/postgresql.yaml
 
-  # Wave 55 - SonarQube
+  # Wave 50 - SonarQube
   - charts/sonarqube.yaml
 
-  # Wave 60 - LogBeacon application
+  # Wave 55 - LogBeacon application
   - apps/workload-apps.yaml
