@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: logbeacon-apps
+  name: workload-logbeacon-apps
   namespace: argocd
 
   annotations:

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: required-ns-sa
+  name: workload-required-ns-sa
   namespace: argocd
 
   annotations:
