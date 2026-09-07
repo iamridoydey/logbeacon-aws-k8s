@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://argoproj.github.io/argo-helm
     chart: argo-rollouts
-    targetRevision: "1.10.0"
+    targetRevision: "2.43.0"
 
   destination:
     name: workload-cluster
