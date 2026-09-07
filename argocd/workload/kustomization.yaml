@@ -15,26 +15,29 @@ resources:
   # Creates application, Cloudflare, SonarQube secrets, etc.
   - resources/external-secrets.yaml
 
-  # Wave 20 - cert-manager
+  # Wave 20 - cert-manager controller + CRDs
   - charts/cert-manager.yaml
 
-  # Wave 25 - Traefik
+  # Wave 25 - cert-manager resources
+  - resources/certificate.yaml
+
+  # Wave 30 - Traefik
   - charts/traefik.yaml
 
-  # Wave 30 - ExternalDNS
+  # Wave 35 - ExternalDNS
   - charts/external-dns.yaml
 
-  # Wave 35 - Argo Rollouts controller + CRDs
+  # Wave 40 - Argo Rollouts controller + CRDs
   - charts/argo-rollouts.yaml
 
-  # Wave 40 - Redis
+  # Wave 45 - Redis
   - charts/redis.yaml
 
-  # Wave 45 - PostgreSQL
+  # Wave 50 - PostgreSQL
   - charts/postgresql.yaml
 
-  # Wave 50 - SonarQube
+  # Wave 55 - SonarQube
   - charts/sonarqube.yaml
 
-  # Wave 55 - LogBeacon application
+  # Wave 60 - LogBeacon application
   - apps/workload-apps.yaml

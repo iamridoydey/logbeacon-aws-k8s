@@ -15,23 +15,26 @@ resources:
   # Creates Cloudflare, GitHub and workload EKS secrets
   - resources/external-secrets.yaml
 
-  # Wave 20 - cert-manager
+  # Wave 20 - cert-manager controller + CRDs
   - charts/cert-manager.yaml
 
-  # Wave 25 - Traefik
+  # Wave 25 - cert-manager resources
+  - resources/certificate.yaml
+
+  # Wave 30 - Traefik
   - charts/traefik.yaml
 
-  # Wave 30 - ExternalDNS
+  # Wave 35 - ExternalDNS
   - charts/external-dns.yaml
 
-  # Wave 35 - Argo CD Image Updater controller + CRD
+  # Wave 40 - Argo CD Image Updater controller + CRD
   - charts/image-updater.yaml
 
-  # Wave 40 - ImageUpdater custom resource
+  # Wave 45 - ImageUpdater custom resource
   - resources/image-updater.yaml
 
-  # Wave 45 - Management applications
+  # Wave 50 - Management applications
   - apps/management-apps.yaml
 
-  # Wave 50 - Bootstrap workload cluster applications
+  # Wave 55 - Bootstrap workload cluster applications
   - workload-root.yaml
