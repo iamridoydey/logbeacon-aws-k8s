@@ -1,3 +1,6 @@
+community:
+  enabled: true
+
 monitoringPasscodeSecretName: sonarqube-monitoring-passcode
 monitoringPasscodeSecretKey: monitoringPasscode
 
