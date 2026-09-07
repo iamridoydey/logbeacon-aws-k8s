@@ -15,7 +15,7 @@ spec:
       trafficRouting:
         plugins:
           argoproj-labs/gatewayAPI:
-            httpRoute: logbeacon-backend
+            httpRoute: logbeacon-frontend
             namespace: logbeacon
       steps:
         - setWeight: 20
