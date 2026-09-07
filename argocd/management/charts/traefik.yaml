@@ -17,7 +17,7 @@ spec:
     # or the provider's informer cache never finishes syncing and
     # GatewayClass/Gateway status updates freeze permanently.
     - repoURL: https://github.com/kubernetes-sigs/gateway-api.git
-      targetRevision: v1.4.1
+      targetRevision: v1.5.1
       path: config/crd/experimental
 
     - repoURL: https://traefik.github.io/charts
