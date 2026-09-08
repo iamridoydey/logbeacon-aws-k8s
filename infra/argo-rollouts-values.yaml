@@ -1,0 +1,25 @@
+# Gateway API traffic routing plugin
+controller:
+  trafficRouterPlugins:
+    - name: argoproj-labs/gatewayAPI
+      location: https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.16.0/gatewayapi-plugin-linux-amd64
+
+
+# Gateway API RBAC
+providerRBAC:
+  enabled: true
+
+  providers:
+    gatewayAPI: true
+
+
+# Argo Rollouts Dashboard
+dashboard:
+  enabled: true
+
+  replicas: 1
+
+  service:
+    type: ClusterIP
+    port: 3100
+    targetPort: 3100
