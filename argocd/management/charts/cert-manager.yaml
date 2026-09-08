@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: managment-cert-manager
+  name: management-cert-manager
   namespace: argocd
 
   annotations:
