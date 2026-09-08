@@ -1,43 +1,30 @@
-apiVersion: argocd-image-updater.argoproj.io/v1alpha1
-kind: ImageUpdater
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 
 metadata:
-  name: logbeacon-image-updater
+  name: management-image-updater-resources
   namespace: argocd
 
   annotations:
     argocd.argoproj.io/sync-wave: "45"
-    
-    # Should be in dry run phase until the creation CRD
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 
 spec:
-  writeBackConfig:
-    method: "git:secret:argocd/github-secret"
+  project: default
 
-    gitConfig:
-      repository: "https://github.com/iamridoydey/logbeacon-aws-k8s.git"
-      branch: "main"
-      writeBackTarget: "kustomization"
+  source:
+    repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
+    targetRevision: main
+    path: infra-resources/image-updater
 
-  applicationRefs:
-    - namePattern: "logbeacon-apps"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
 
-      images:
-        - alias: frontend
-          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend:1.x"
-          commonUpdateSettings:
-            updateStrategy: semver
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
 
-          manifestTargets:
-            kustomize:
-              name: "logbeacon/frontend"
-
-        - alias: backend
-          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend:1.x"
-          commonUpdateSettings:
-            updateStrategy: semver
-
-          manifestTargets:
-            kustomize:
-              name: "logbeacon/backend"
+    syncOptions:
+      - CreateNamespace=true
+      - SkipDryRunOnMissingResource=true
