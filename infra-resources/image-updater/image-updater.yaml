@@ -12,7 +12,7 @@ spec:
     gitConfig:
       repository: "https://github.com/iamridoydey/logbeacon-aws-k8s.git"
       branch: "main"
-      writeBackTarget: "kustomization:apps/workload/logbeacon"
+      writeBackTarget: "kustomization:logbeacon"
 
   applicationRefs:
     - namePattern: "workload-logbeacon-apps"
