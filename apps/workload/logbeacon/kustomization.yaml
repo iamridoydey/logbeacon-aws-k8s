@@ -16,4 +16,4 @@ images:
     newTag: v1.0.0
   - name: logbeacon/frontend
     newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
-    newTag: v1.0.0
+    newTag: v1.0.1
