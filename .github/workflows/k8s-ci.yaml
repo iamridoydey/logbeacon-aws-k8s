@@ -1,0 +1,135 @@
+name: LogBeacon K8s CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+
+  # ============================================================
+  # YAML LINT
+  # ============================================================
+  yaml-lint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Run YAML Lint
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: .
+
+
+  # ============================================================
+  # CHECKOV
+  # ============================================================
+  checkov:
+    name: Checkov Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: kubernetes
+          soft_fail: false
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+
+      - name: Upload Checkov SARIF Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-sarif-report
+          path: results.sarif
+          if-no-files-found: ignore
+
+
+  # ============================================================
+  # KUSTOMIZE BUILD
+  # ============================================================
+  kustomize-build:
+    name: Kustomize Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+        with:
+          kustomize-version: "v5.8.1"
+
+      - name: Create Render Directory
+        run: mkdir -p rendered
+
+      - name: Render Workload Manifests
+        run: |
+          kustomize build apps/workload \
+            > rendered/workload-rendered.yaml
+
+      - name: Show Rendered Manifests
+        run: |
+          cat rendered/workload-rendered.yaml
+
+      - name: Upload Rendered Manifests
+        uses: actions/upload-artifact@v4
+        with:
+          name: workload-rendered-manifests
+          path: rendered/workload-rendered.yaml
+          retention-days: 1
+
+
+  # ============================================================
+  # KUBECONFORM
+  # ============================================================
+  kubeconform:
+    name: Kubeconform Schema Validation
+
+    needs:
+      - kustomize-build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Kubeconform does not need to checkout the repository here.
+      # It only needs the rendered manifest produced by Kustomize.
+
+      - name: Download Rendered Manifests
+        uses: actions/download-artifact@v4
+        with:
+          name: workload-rendered-manifests
+          path: rendered
+
+      - name: Setup Kubeconform
+        uses: bmuschko/setup-kubeconform@v1
+        with:
+          kubeconform-version: "0.8.0"
+
+      - name: Validate Kubernetes Schemas
+        run: |
+          kubeconform \
+            -strict \
+            -summary \
+            -verbose \
+            -ignore-missing-schemas \
+            -kubernetes-version 1.33.0 \
+            rendered/workload-rendered.yaml
