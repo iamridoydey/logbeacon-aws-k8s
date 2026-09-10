@@ -44,7 +44,7 @@ jobs:
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v3
         with:
-          kustomize-version: "v5.8.1"
+          kustomize-version: "5.8.1"
 
       - name: Create Render Directory
         run: mkdir -p rendered
