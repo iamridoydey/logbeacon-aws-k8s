@@ -13,7 +13,7 @@ spec:
     repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
     targetRevision: HEAD
     path: apps/management
-  
+
   destination:
     server: https://kubernetes.default.svc
 
