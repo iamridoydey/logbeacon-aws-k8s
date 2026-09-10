@@ -31,37 +31,6 @@ jobs:
 
 
   # ============================================================
-  # CHECKOV
-  # ============================================================
-  checkov:
-    name: Checkov Security Scan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@v12
-        with:
-          directory: .
-          framework: kubernetes
-          soft_fail: false
-          output_format: cli,sarif
-          output_file_path: console,results.sarif
-
-      - name: Upload Checkov SARIF Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: checkov-sarif-report
-          path: results.sarif
-          if-no-files-found: ignore
-
-
-  # ============================================================
   # KUSTOMIZE BUILD
   # ============================================================
   kustomize-build:
@@ -71,8 +40,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v3
@@ -98,6 +65,38 @@ jobs:
           path: rendered/workload-rendered.yaml
           retention-days: 1
 
+  # ============================================================
+  # CHECKOV
+  # ============================================================
+  checkov:
+    name: Checkov Security Scan
+    needs:
+      - kustomize-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Rendered Manifests
+        uses: actions/download-artifact@v4
+        with:
+          name: workload-rendered-manifests
+          path: rendered
+
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          file: rendered/workload-rendered.yaml
+          framework: kubernetes
+          soft_fail: false
+          output_format: cli,sarif
+          output_file_path: console,results.sarif
+
+      - name: Upload Checkov SARIF Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-sarif-report
+          path: results.sarif
+          if-no-files-found: ignore
 
   # ============================================================
   # KUBECONFORM
