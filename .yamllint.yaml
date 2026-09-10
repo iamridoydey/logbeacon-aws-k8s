@@ -1,0 +1,16 @@
+extends: default
+
+rules:
+  # Kubernetes manifests do not need to start with ---
+  document-start: disable
+
+  # URLs, annotations, Helm values, etc. can legitimately be long
+  line-length: disable
+
+  # Prevent GitHub Actions `on:` from being treated as a truthy value
+  truthy:
+    check-keys: false
+
+  # One space before an inline comment is enough
+  comments:
+    min-spaces-from-content: 1
