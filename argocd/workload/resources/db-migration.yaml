@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/iamridoydey/logbeacon-aws-k8s.git
     targetRevision: main
-    path: infra-resources/external-secrets/db-migration
+    path: infra-resources/external-secrets/db-migration/db-migration.yaml
 
   destination:
     name: workload-cluster
