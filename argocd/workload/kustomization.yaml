@@ -45,5 +45,5 @@ resources:
   # Wave 60 - LogBeacon application
   - apps/workload-apps.yaml
 
-  # Wave 60 - LogBeacon application
-  - apps/db-migration.yaml
+  # Wave 65 - LogBeacon application
+  - resources/db-migration.yaml
