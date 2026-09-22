@@ -25,7 +25,7 @@ spec:
           imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend"
 
           commonUpdateSettings:
-            updateStrategy: digest
+            updateStrategy: newest-build
 
           manifestTargets:
             kustomize:
@@ -35,7 +35,7 @@ spec:
           imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend"
 
           commonUpdateSettings:
-            updateStrategy: digest
+            updateStrategy: newest-build
 
           manifestTargets:
             kustomize:
