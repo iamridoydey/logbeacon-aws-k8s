@@ -13,7 +13,7 @@ resources:
 images:
   - name: logbeacon/backend
     newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend
-    newTag: "hash"
+    newTag: 46d8f8b
   - name: logbeacon/frontend
     newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
-    newTag: "hash"
+    newTag: 46d8f8b
