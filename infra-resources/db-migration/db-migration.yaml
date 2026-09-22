@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: Job
+
+metadata:
+  name: logbeacon-db-migrate
+  namespace: logbeacon
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+
+spec:
+  completions: 1
+  parallelism: 1
+  backoffLimit: 0
+  activeDeadlineSeconds: 600
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: logbeacon-db-migrate
+
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: migrate
+          image: logbeacon/backend
+          imagePullPolicy: IfNotPresent
+
+          workingDir: /app
+          command: ["python", "-m", "alembic"]
+          args:
+            - "-c"
+            - "/app/alembic.ini"
+            - "upgrade"
+            - "head"
+
+          envFrom:
+            - configMapRef:
+                name: logbeacon-backend-config
+            - secretRef:
+                name: ogbeacon-app-secret
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
