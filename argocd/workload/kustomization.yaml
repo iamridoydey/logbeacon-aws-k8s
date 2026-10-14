@@ -33,6 +33,14 @@ resources:
   # Wave 40 - Argo Rollouts controller + CRDs
   - charts/argo-rollouts.yaml
 
+  # Wave 42 - Grafana + prometheus
+  - charts/kube-prometheus-stack.yaml
+  # Wave 43 - Loki + Tempo
+  - charts/loki.yaml
+  - charts/tempo.yaml
+  # Wave 44 - otel-collector
+  - charts/otel-collector.yaml
+
   # Wave 45 - Redis
   - charts/redis.yaml
 
