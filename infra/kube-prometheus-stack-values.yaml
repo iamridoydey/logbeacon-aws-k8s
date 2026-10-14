@@ -1,0 +1,97 @@
+grafana:
+  enabled: true
+  image:
+    tag: "13.2.2"
+  admin:
+    existingSecret: logbeacon-app-secret
+    userKey: GRAFANA_ADMIN_USER
+    passwordKey: GRAFANA_ADMIN_PASSWORD
+  env:
+    GF_USERS_ALLOW_SIGN_UP: "false"
+    GF_SERVER_ROOT_URL: https://grafana.aws-logbeacon.iamridoydey.me
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      labelValue: "1"
+      searchNamespace: monitoring
+    datasources:
+      enabled: true
+  additionalDataSources:
+    - name: Prometheus
+      uid: prometheus
+      type: prometheus
+      access: proxy
+      url: http://workload-kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+      isDefault: true
+      editable: false
+      jsonData:
+        httpMethod: POST
+        timeInterval: 15s
+
+    - name: Tempo
+      uid: tempo
+      type: tempo
+      access: proxy
+      url: http://workload-tempo.monitoring.svc.cluster.local:3200
+      editable: false
+      jsonData:
+        tracesToLogsV2:
+          datasourceUid: loki
+          spanStartTimeShift: "-5m"
+          spanEndTimeShift: "5m"
+          customQuery: true
+          query: '{service_name="$${__span.tags[\"service.name\"]}"} | trace_id="$${__span.traceId}"'
+          
+    - name: Loki
+      uid: loki
+      type: loki
+      access: proxy
+      url: http://workload-loki.monitoring.svc.cluster.local:3100
+      editable: false
+      jsonData:
+        derivedFields:
+          - name: trace_id
+            matcherType: label
+            matcherRegex: trace_id
+            url: "$${__value.raw}"
+            datasourceUid: tempo
+  service:
+    type: ClusterIP
+    port: 80
+
+prometheus:
+  prometheusSpec:
+    retention: 30d
+    scrapeInterval: 15s
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    additionalScrapeConfigs:
+      - job_name: otel-collector
+        honor_labels: true
+        static_configs:
+          - targets: ["workload-otel-collector.monitoring.svc.cluster.local:8889"]
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: ebs-gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+alertmanager:
+  enabled: true
+
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true

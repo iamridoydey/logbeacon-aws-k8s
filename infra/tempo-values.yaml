@@ -1,0 +1,22 @@
+tempo:
+  repository: grafana/tempo
+  tag: 2.10.8
+  retention: 72h
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+
+persistence:
+  enabled: true
+  storageClassName: ebs-gp3
+  size: 10Gi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 1Gi
