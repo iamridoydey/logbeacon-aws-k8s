@@ -3,7 +3,7 @@ grafana:
   image:
     tag: "13.2.2"
   admin:
-    existingSecret: logbeacon-app-secret
+    existingSecret: monitoring-secrets
     userKey: GRAFANA_ADMIN_USER
     passwordKey: GRAFANA_ADMIN_PASSWORD
   env:
