@@ -21,7 +21,12 @@ loki:
     allow_structured_metadata: true
     retention_period: 72h
   compactor:
+    working_directory: /var/loki/compactor
     retention_enabled: true
+    delete_request_store: filesystem
+    compaction_interval: 10m
+    retention_delete_delay: 2h
+    retention_delete_worker_count: 150
 
 singleBinary:
   replicas: 1
@@ -37,7 +42,7 @@ singleBinary:
       cpu: 500m
       memory: 1Gi
 
-# Required to silence the validation error
+# Required when using SingleBinary mode
 backend:
   replicas: 0
 read:
