@@ -47,6 +47,7 @@ config:
             scrape_interval: 15s
             static_configs:
               - targets: ["redis-exporter.logbeacon.svc.cluster.local:9121"]
+
   processors:
     memory_limiter:
       check_interval: 1s
@@ -55,6 +56,7 @@ config:
     batch:
       timeout: 5s
       send_batch_size: 1024
+
   exporters:
     otlp/tempo:
       endpoint: workload-tempo.monitoring.svc.cluster.local:4317
@@ -64,7 +66,11 @@ config:
       endpoint: http://workload-loki.monitoring.svc.cluster.local:3100/otlp
     prometheus:
       endpoint: 0.0.0.0:8889
+
   service:
+    telemetry:
+      metrics:
+        level: basic
     pipelines:
       traces:
         receivers: [otlp]
