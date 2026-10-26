@@ -37,6 +37,14 @@ singleBinary:
       cpu: 500m
       memory: 1Gi
 
+# Required to silence the validation error
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+
 gateway:
   enabled: false
 
