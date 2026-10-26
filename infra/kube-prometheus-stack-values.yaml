@@ -23,7 +23,7 @@ grafana:
       type: prometheus
       access: proxy
       url: http://workload-kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
-      isDefault: true
+      isDefault: false
       editable: false
       jsonData:
         httpMethod: POST
