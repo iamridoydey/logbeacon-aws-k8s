@@ -48,7 +48,7 @@ spec:
             - configMapRef:
                 name: logbeacon-backend-config
             - secretRef:
-                name: ogbeacon-app-secret
+                name: logbeacon-app-secret
 
           securityContext:
             allowPrivilegeEscalation: false
