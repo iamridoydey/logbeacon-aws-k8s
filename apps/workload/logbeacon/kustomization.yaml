@@ -17,4 +17,3 @@ images:
   - name: logbeacon/frontend
     newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
     newTag: 2fb4459
-
