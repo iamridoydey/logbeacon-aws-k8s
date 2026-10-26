@@ -10,7 +10,8 @@ spec:
   sources:
     - repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
       chart: opentelemetry-collector
-      targetRevision: 0.108.0
+      # Chart 0.174.0 ships appVersion 0.161.0, matching image.tag in the values file.
+      targetRevision: 0.174.0
       helm:
         valueFiles:
           - $values/infra/otel-collector-values.yaml
