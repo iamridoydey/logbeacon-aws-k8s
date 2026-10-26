@@ -2,6 +2,7 @@ mode: deployment
 
 image:
   repository: otel/opentelemetry-collector-contrib
+  # Matches chart 0.174.0 (appVersion 0.161.0)
   tag: "0.161.0"
 
 resources:
