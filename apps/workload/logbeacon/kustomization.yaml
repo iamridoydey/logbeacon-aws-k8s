@@ -12,8 +12,8 @@ resources:
   - httproute.yaml
 images:
   - name: logbeacon/backend
-    newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend
+    newName: 402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend
     newTag: 2fb4459
   - name: logbeacon/frontend
-    newName: 869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
+    newName: 402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
     newTag: 2fb4459
