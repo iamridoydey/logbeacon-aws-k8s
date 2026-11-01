@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   backoffLimit: 5
-  activeDeadlineSeconds: 900
+  activeDeadlineSeconds: 1800
   template:
     metadata:
       labels:
@@ -42,7 +42,7 @@ spec:
             - |
               set -eu
 
-              # Install curl if missing (amazon/aws-cli image often lacks it)
+              # Install curl if missing
               if ! command -v curl >/dev/null 2>&1; then
                 yum install -y curl || apk add --no-cache curl
               fi
@@ -66,10 +66,10 @@ spec:
                 exit 1
               fi
 
-              # Verify admin password works
+              # Verify admin password works (Helm setAdminPassword should have already set it)
               if ! curl -sf -u "admin:${ADMIN_PASSWORD}" \
                 "${SONAR_HOST_URL}/api/authentication/validate" | grep -q '"valid":true'; then
-                echo "ERROR: Admin authentication failed. Check password or Helm setAdminPassword hook." >&2
+                echo "ERROR: Admin authentication failed. Check Helm setAdminPassword hook." >&2
                 exit 1
               fi
               echo "Admin credentials verified."
@@ -88,7 +88,7 @@ spec:
                 fi
               fi
 
-              # Revoke any stale token with the same name
+              # Revoke any stale token
               echo "Revoking any pre-existing token named logbeacon-ci-cred..."
               curl -sf -u "admin:${ADMIN_PASSWORD}" -X POST \
                 --data-urlencode "name=logbeacon-ci-cred" \
