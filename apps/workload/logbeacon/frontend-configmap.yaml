@@ -1,8 +1,17 @@
 apiVersion: v1
 kind: ConfigMap
-
 metadata:
   name: logbeacon-frontend-config
-
+  namespace: logbeacon
 data:
-  FLASK_API_URL: "https://api.aws-logbeacon.iamridoydey.me"
+  FLASK_API_URL: "http://logbeacon-backend-stable:5000"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  OTEL_SERVICE_NAME: "logbeacon-frontend"
+  OTEL_TRACES_EXPORTER: "otlp"
+  OTEL_METRICS_EXPORTER: "otlp"
+  OTEL_LOGS_EXPORTER: "otlp"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://workload-otel-collector-opentelemetry-collector:4318"
+  OTEL_NODE_RESOURCE_DETECTORS: "env,host,os,process"
+  NODE_OPTIONS: "--experimental-loader=@opentelemetry/instrumentation/hook.mjs --import @opentelemetry/auto-instrumentations-node/register"
