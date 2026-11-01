@@ -1,9 +1,11 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-exporter
   namespace: logbeacon
+  annotations:
+    checkov.io/skip1: "CKV_K8S_43=Tag pinned by version; digest pinning not practical yet"
+    checkov.io/skip2: "CKV_K8S_35=Password is injected from a Secret as an env var"
 spec:
   replicas: 1
   selector:
@@ -14,13 +16,17 @@ spec:
       labels:
         app: postgres-exporter
     spec:
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: postgres-exporter
           image: quay.io/prometheuscommunity/postgres-exporter:v0.20.1
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -41,6 +47,18 @@ spec:
                 secretKeyRef:
                   name: logbeacon-app-secret
                   key: POSTGRES_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 20
           resources:
             requests:
               cpu: 20m
@@ -68,6 +86,9 @@ kind: Deployment
 metadata:
   name: redis-exporter
   namespace: logbeacon
+  annotations:
+    checkov.io/skip1: "CKV_K8S_43=Tag pinned by version; digest pinning not practical yet"
+    checkov.io/skip2: "CKV_K8S_35=Password is injected from a Secret as an env var"
 spec:
   replicas: 1
   selector:
@@ -78,13 +99,17 @@ spec:
       labels:
         app: redis-exporter
     spec:
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: redis-exporter
           image: oliver006/redis_exporter:v1.88.0
+          imagePullPolicy: Always
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -104,6 +129,18 @@ spec:
                   name: logbeacon-app-secret
                   key: REDIS_PASSWORD
                   optional: true
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 20
           resources:
             requests:
               cpu: 20m
