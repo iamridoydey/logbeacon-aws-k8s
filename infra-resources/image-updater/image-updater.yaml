@@ -22,7 +22,7 @@ spec:
 
       images:
         - alias: frontend
-          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend"
+          imageName: "402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend"
 
           commonUpdateSettings:
             updateStrategy: newest-build
@@ -32,7 +32,7 @@ spec:
               name: "logbeacon/frontend"
 
         - alias: backend
-          imageName: "869719105525.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend"
+          imageName: "402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend"
 
           commonUpdateSettings:
             updateStrategy: newest-build
