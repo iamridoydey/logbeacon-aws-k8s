@@ -1,16 +1,26 @@
 apiVersion: v1
 kind: ConfigMap
-
 metadata:
   name: logbeacon-backend-config
-
+  namespace: logbeacon
 data:
+  # App
+  SQLALCHEMY_TRACK_MODIFICATIONS: "False"
   GROQ_MODEL: "openai/gpt-oss-120b"
-  CHAT_RETENTION_DAYS: "30"
+  LOG_RETENTION_DAYS: "30"
   MAX_ERROR_LENGTH: "5000"
-  PRICE_PER_MILLION_TOKENS: "0.59"
-
-  SMTP_HOST: "smtp.example.com"
+  PRICE_PER_MILLION_TOKENS: "1"
+  SMTP_HOST: "smtp.gmail.com"
   SMTP_PORT: "587"
+  ALLOWED_ORIGINS: "http://localhost:3000,http://logbeacon-frontend-stable:3000,https://aws-logbeacon.iamridoydey.me"
+  LOG_LEVEL: "INFO"
 
-  ALLOWED_ORIGINS: "http://localhost:3000,https://aws-logbeacon.iamridoydey.me"
+  # Observability (plain OTEL_* names, which is what the SDK reads)
+  OTEL_SERVICE_NAME: "logbeacon-backend"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://workload-otel-collector-opentelemetry-collector:4318"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_TRACES_EXPORTER: "otlp"
+  OTEL_METRICS_EXPORTER: "otlp"
+  OTEL_LOGS_EXPORTER: "otlp"
+  OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED: "true"
+  OTEL_PYTHON_DISABLED_INSTRUMENTATIONS: "psycopg2"
