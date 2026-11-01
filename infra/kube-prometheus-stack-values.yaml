@@ -17,13 +17,14 @@ grafana:
       searchNamespace: monitoring
     datasources:
       enabled: true
+      defaultDatasourceEnabled: false
   additionalDataSources:
     - name: Prometheus
       uid: prometheus
       type: prometheus
       access: proxy
-      url: http://workload-kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
-      isDefault: false
+      url: http://workload-kube-prometheus-s-prometheus.monitoring.svc.cluster.local:9090
+      isDefault: true
       editable: false
       jsonData:
         httpMethod: POST
@@ -33,7 +34,7 @@ grafana:
       uid: tempo
       type: tempo
       access: proxy
-      url: http://workload-tempo.monitoring.svc.cluster.local:3200
+      url: http://workload-tempo.monitoring.svc.cluster.local:3100
       editable: false
       jsonData:
         tracesToLogsV2:
@@ -71,7 +72,7 @@ prometheus:
         honor_labels: true
         static_configs:
           - targets:
-              ["workload-otel-collector.monitoring.svc.cluster.local:8889"]
+              ["workload-otel-collector-opentelemetry-collector.monitoring.svc.cluster.local:8889"]
     resources:
       requests:
         cpu: 200m
