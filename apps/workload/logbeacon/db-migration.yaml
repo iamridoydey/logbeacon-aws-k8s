@@ -4,10 +4,10 @@ metadata:
   name: logbeacon-db-migrate
   namespace: logbeacon
   annotations:
-    argocd.argoproj.io/hook: PostSync                          # runs after the backend is Healthy
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation  # fresh Job on every sync
+    argocd.argoproj.io/hook: PostSync # runs after the backend is Healthy
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation # fresh Job on every sync
 spec:
-  backoffLimit: 3        
+  backoffLimit: 3
   activeDeadlineSeconds: 600
   template:
     metadata:
@@ -24,7 +24,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: migrate
-          image: logbeacon/backend  
+          image: logbeacon/backend
           imagePullPolicy: IfNotPresent
           workingDir: /app
           command: ["python", "-m", "alembic"]
@@ -40,7 +40,8 @@ spec:
                 secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_USER }
             - name: POSTGRES_PASSWORD
               valueFrom:
-                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_PASSWORD }
+                secretKeyRef:
+                  { name: logbeacon-app-secret, key: POSTGRES_PASSWORD }
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_DB }
@@ -48,9 +49,9 @@ spec:
               value: "workload-postgresql"
             - name: POSTGRES_PORT
               value: "5432"
-            - name: DATABASE_URL          # must stay AFTER the variables it uses
+            - name: DATABASE_URL # must stay AFTER the variables it uses
               value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
-            - name: REDIS_URL             # only here because app/queue.py connects at import time
+            - name: REDIS_URL # only here because app/queue.py connects at import time
               value: "redis://workload-redis-master:6379/0"
           securityContext:
             allowPrivilegeEscalation: false

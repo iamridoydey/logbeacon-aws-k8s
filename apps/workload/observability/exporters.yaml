@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,12 +14,23 @@ spec:
       labels:
         app: postgres-exporter
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: postgres-exporter
           image: quay.io/prometheuscommunity/postgres-exporter:v0.20.1
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: metrics
               containerPort: 9187
+              protocol: TCP
           env:
             - name: DATA_SOURCE_URI
               value: workload-postgresql:5432/logbeacon_db?sslmode=disable
@@ -49,6 +61,7 @@ spec:
     - name: metrics
       port: 9187
       targetPort: 9187
+      protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -65,12 +78,23 @@ spec:
       labels:
         app: redis-exporter
     spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: redis-exporter
           image: oliver006/redis_exporter:v1.88.0
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: metrics
               containerPort: 9121
+              protocol: TCP
           env:
             - name: REDIS_ADDR
               value: redis://workload-redis-master:6379
@@ -100,3 +124,82 @@ spec:
     - name: metrics
       port: 9121
       targetPort: 9121
+      protocol: TCP
+---
+# PostgreSQL exporter NetworkPolicy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-exporter
+  namespace: logbeacon
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: opentelemetry-collector
+      ports:
+        - protocol: TCP
+          port: 9187
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Redis exporter NetworkPolicy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-exporter
+  namespace: logbeacon
+spec:
+  podSelector:
+    matchLabels:
+      app: redis-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: opentelemetry-collector
+      ports:
+        - protocol: TCP
+          port: 9121
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
