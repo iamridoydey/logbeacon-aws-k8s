@@ -4,6 +4,10 @@ community:
 monitoringPasscodeSecretName: sonarqube-monitoring-passcode
 monitoringPasscodeSecretKey: monitoringPasscode
 
+# Add this block
+setAdminPassword:
+  passwordSecretName: sonarqube-admin-password
+
 serviceAccount:
   create: true
   name: sonarqube
@@ -18,7 +22,6 @@ resources:
   requests:
     cpu: 256m
     memory: 1Gi
-
   limits:
     cpu: "512m"
     memory: 2Gi
