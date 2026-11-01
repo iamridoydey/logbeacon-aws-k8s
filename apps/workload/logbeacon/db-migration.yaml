@@ -1,64 +1,61 @@
 apiVersion: batch/v1
 kind: Job
-
 metadata:
   name: logbeacon-db-migrate
   namespace: logbeacon
-  
-annotations:
-  argocd.argoproj.io/hook: PostSync
-  argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
-
+  annotations:
+    argocd.argoproj.io/hook: PostSync                          # runs after the backend is Healthy
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation  # fresh Job on every sync
 spec:
-  completions: 1
-  parallelism: 1
-  backoffLimit: 0
+  backoffLimit: 3        
   activeDeadlineSeconds: 600
-
   template:
     metadata:
       labels:
         app.kubernetes.io/name: logbeacon-db-migrate
-
     spec:
       restartPolicy: Never
       automountServiceAccountToken: false
-
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
         runAsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
-
       containers:
         - name: migrate
-          image: logbeacon/backend
+          image: logbeacon/backend  
           imagePullPolicy: IfNotPresent
-
           workingDir: /app
           command: ["python", "-m", "alembic"]
-          args:
-            - "-c"
-            - "/app/alembic.ini"
-            - "upgrade"
-            - "head"
-
+          args: ["-c", "/app/alembic.ini", "upgrade", "head"]
           envFrom:
             - configMapRef:
                 name: logbeacon-backend-config
             - secretRef:
                 name: logbeacon-app-secret
-
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_USER }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_PASSWORD }
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_DB }
+            - name: POSTGRES_HOST
+              value: "workload-postgresql"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: DATABASE_URL          # must stay AFTER the variables it uses
+              value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
+            - name: REDIS_URL             # only here because app/queue.py connects at import time
+              value: "redis://workload-redis-master:6379/0"
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
-
           resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
+            requests: { cpu: 100m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
