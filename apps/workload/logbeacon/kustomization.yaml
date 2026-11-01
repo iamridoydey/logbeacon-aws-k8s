@@ -14,7 +14,7 @@ resources:
 images:
   - name: logbeacon/backend
     newName: 402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend
-    newTag: 2fb4459
+    newTag: c1a6912
   - name: logbeacon/frontend
     newName: 402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/frontend
-    newTag: 2fb4459
+    newTag: c1a6912
