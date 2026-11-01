@@ -4,10 +4,14 @@ metadata:
   name: logbeacon-db-migrate
   namespace: logbeacon
   annotations:
-    argocd.argoproj.io/hook: PostSync                          # runs after the backend is Healthy
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation  # fresh Job on every sync
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    checkov.io/skip1: "CKV_K8S_43=Image tag is managed by Image Updater"
+    checkov.io/skip2: "CKV_K8S_35=App reads DB credentials from env vars"
 spec:
-  backoffLimit: 3        
+  completions: 1
+  parallelism: 1
+  backoffLimit: 3
   activeDeadlineSeconds: 600
   template:
     metadata:
@@ -22,13 +26,20 @@ spec:
         runAsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
+      volumes:
+        - name: tmp
+          emptyDir: {}
       containers:
         - name: migrate
-          image: logbeacon/backend  
-          imagePullPolicy: IfNotPresent
+          image: logbeacon/backend
+          imagePullPolicy: Always
           workingDir: /app
           command: ["python", "-m", "alembic"]
-          args: ["-c", "/app/alembic.ini", "upgrade", "head"]
+          args:
+            - "-c"
+            - "/app/alembic.ini"
+            - "upgrade"
+            - "head"
           envFrom:
             - configMapRef:
                 name: logbeacon-backend-config
@@ -37,25 +48,78 @@ spec:
           env:
             - name: POSTGRES_USER
               valueFrom:
-                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_USER }
+                secretKeyRef:
+                  name: logbeacon-app-secret
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
-                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_PASSWORD }
+                secretKeyRef:
+                  name: logbeacon-app-secret
+                  key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               valueFrom:
-                secretKeyRef: { name: logbeacon-app-secret, key: POSTGRES_DB }
+                secretKeyRef:
+                  name: logbeacon-app-secret
+                  key: POSTGRES_DB
             - name: POSTGRES_HOST
               value: "workload-postgresql"
             - name: POSTGRES_PORT
               value: "5432"
-            - name: DATABASE_URL          # must stay AFTER the variables it uses
+            # Must stay AFTER the variables it references.
+            - name: DATABASE_URL
               value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
-            - name: REDIS_URL             # only here because app/queue.py connects at import time
+            # Only needed while app/queue.py connects to Redis at import time.
+            - name: REDIS_URL
               value: "redis://workload-redis-master:6379/0"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
-              drop: ["ALL"]
+              drop:
+                - ALL
           resources:
-            requests: { cpu: 100m, memory: 128Mi }
-            limits: { cpu: 500m, memory: 512Mi }
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: logbeacon-db-migrate
+  namespace: logbeacon
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: logbeacon-db-migrate
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

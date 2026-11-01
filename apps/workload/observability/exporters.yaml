@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: postgres-exporter
   namespace: logbeacon
+  annotations:
+    checkov.io/skip1: "CKV_K8S_43=Tag pinned by version; digest pinning not practical yet"
+    checkov.io/skip2: "CKV_K8S_35=Password is injected from a Secret as an env var"
 spec:
   replicas: 1
   selector:
@@ -13,12 +16,27 @@ spec:
       labels:
         app: postgres-exporter
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: postgres-exporter
           image: quay.io/prometheuscommunity/postgres-exporter:v0.20.1
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: metrics
               containerPort: 9187
+              protocol: TCP
           env:
             - name: DATA_SOURCE_URI
               value: workload-postgresql:5432/logbeacon_db?sslmode=disable
@@ -29,6 +47,18 @@ spec:
                 secretKeyRef:
                   name: logbeacon-app-secret
                   key: POSTGRES_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 20
           resources:
             requests:
               cpu: 20m
@@ -49,12 +79,16 @@ spec:
     - name: metrics
       port: 9187
       targetPort: 9187
+      protocol: TCP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis-exporter
   namespace: logbeacon
+  annotations:
+    checkov.io/skip1: "CKV_K8S_43=Tag pinned by version; digest pinning not practical yet"
+    checkov.io/skip2: "CKV_K8S_35=Password is injected from a Secret as an env var"
 spec:
   replicas: 1
   selector:
@@ -65,12 +99,27 @@ spec:
       labels:
         app: redis-exporter
     spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: redis-exporter
           image: oliver006/redis_exporter:v1.88.0
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: metrics
               containerPort: 9121
+              protocol: TCP
           env:
             - name: REDIS_ADDR
               value: redis://workload-redis-master:6379
@@ -80,6 +129,18 @@ spec:
                   name: logbeacon-app-secret
                   key: REDIS_PASSWORD
                   optional: true
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 15
+            periodSeconds: 20
           resources:
             requests:
               cpu: 20m
@@ -100,3 +161,82 @@ spec:
     - name: metrics
       port: 9121
       targetPort: 9121
+      protocol: TCP
+---
+# PostgreSQL exporter NetworkPolicy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: postgres-exporter
+  namespace: logbeacon
+spec:
+  podSelector:
+    matchLabels:
+      app: postgres-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: opentelemetry-collector
+      ports:
+        - protocol: TCP
+          port: 9187
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+      ports:
+        - protocol: TCP
+          port: 5432
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# Redis exporter NetworkPolicy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: redis-exporter
+  namespace: logbeacon
+spec:
+  podSelector:
+    matchLabels:
+      app: redis-exporter
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: opentelemetry-collector
+      ports:
+        - protocol: TCP
+          port: 9121
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: redis
+      ports:
+        - protocol: TCP
+          port: 6379
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

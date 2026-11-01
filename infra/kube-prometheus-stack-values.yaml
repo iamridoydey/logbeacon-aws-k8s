@@ -42,7 +42,7 @@ grafana:
           spanEndTimeShift: "5m"
           customQuery: true
           query: '{service_name="$${__span.tags[\"service.name\"]}"} | trace_id="$${__span.traceId}"'
-          
+
     - name: Loki
       uid: loki
       type: loki
@@ -70,7 +70,8 @@ prometheus:
       - job_name: otel-collector
         honor_labels: true
         static_configs:
-          - targets: ["workload-otel-collector.monitoring.svc.cluster.local:8889"]
+          - targets:
+              ["workload-otel-collector.monitoring.svc.cluster.local:8889"]
     resources:
       requests:
         cpu: 200m
