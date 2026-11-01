@@ -10,6 +10,8 @@ resources:
   - frontend-service.yaml
   - gateway.yaml
   - httproute.yaml
+  - db-migration.yaml
+  
 images:
   - name: logbeacon/backend
     newName: 402938031713.dkr.ecr.us-east-1.amazonaws.com/logbeacon/backend
