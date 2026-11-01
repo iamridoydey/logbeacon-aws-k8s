@@ -17,7 +17,7 @@ data:
 
   # Observability (plain OTEL_* names, which is what the SDK reads)
   OTEL_SERVICE_NAME: "logbeacon-backend"
-  OTEL_EXPORTER_OTLP_ENDPOINT: "http://workload-otel-collector-opentelemetry-collector:4318"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://workload-otel-collector-opentelemetry-collector.monitoring.svc.cluster.local:4318"
   OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
   OTEL_TRACES_EXPORTER: "otlp"
   OTEL_METRICS_EXPORTER: "otlp"
