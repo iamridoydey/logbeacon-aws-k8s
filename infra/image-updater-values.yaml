@@ -14,8 +14,8 @@ config:
 
   registries:
     - name: ECR
-      api_url: https://869719105525.dkr.ecr.us-east-1.amazonaws.com
-      prefix: 869719105525.dkr.ecr.us-east-1.amazonaws.com
+      api_url: https://402938031713.dkr.ecr.us-east-1.amazonaws.com
+      prefix: 402938031713.dkr.ecr.us-east-1.amazonaws.com
       credentials: ext:/scripts/auth-ecr.sh
       credsexpire: 10h
 
